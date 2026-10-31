@@ -1,0 +1,25 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+*.tfplan
+crash.log
+crash.*.log
+
+# AWS and credentials
+.aws/
+*.pem
+*.key
+.env
+.env.*
+kubeconfig*
+
+# Helm local values
+current-values.yaml
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store

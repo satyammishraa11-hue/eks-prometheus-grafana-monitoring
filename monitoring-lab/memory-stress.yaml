@@ -1,0 +1,36 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memory-stress-app
+  namespace: monitoring-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: memory-stress-app
+  template:
+    metadata:
+      labels:
+        app: memory-stress-app
+    spec:
+      containers:
+        - name: stress
+          image: polinux/stress
+          command:
+            - stress
+          args:
+            - "--vm"
+            - "1"
+            - "--vm-bytes"
+            - "512M"
+            - "--vm-hang"
+            - "0"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "700Mi"
+

@@ -1,0 +1,64 @@
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: lab-resource-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: lab-resource-alerts
+      rules:
+        - alert: LabApplicationHighCPU
+          expr: |
+            (
+              sum by (namespace, pod, container) (
+                rate(container_cpu_usage_seconds_total{
+                  namespace="monitoring-lab",
+                  container!="",
+                  container!="POD"
+                }[5m])
+              )
+              /
+              sum by (namespace, pod, container) (
+                kube_pod_container_resource_limits{
+                  namespace="monitoring-lab",
+                  resource="cpu",
+                  unit="core"
+                }
+              )
+            ) > 0.70
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High CPU usage in lab application"
+            description: "Pod {{ $labels.pod }} has CPU usage above 70% of its limit."
+
+        - alert: LabApplicationHighMemory
+          expr: |
+            (
+              sum by (namespace, pod, container) (
+                container_memory_working_set_bytes{
+                  namespace="monitoring-lab",
+                  container!="",
+                  container!="POD"
+                }
+              )
+              /
+              sum by (namespace, pod, container) (
+                kube_pod_container_resource_limits{
+                  namespace="monitoring-lab",
+                  resource="memory",
+                  unit="byte"
+                }
+              )
+            ) > 0.70
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High memory usage in lab application"
+            description: "Pod {{ $labels.pod }} has memory usage above 70% of its limit."
+
